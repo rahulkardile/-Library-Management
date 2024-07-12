@@ -5,28 +5,46 @@ import Book from "../models/Book.js";
 
 const router = express.Router();
 
+router.get("/all", async (req, res, next) => {
+    try {
+
+        const { page = 1, limit = 10, sortBy = 'title', order = 'asc' } = req.query;
+
+        console.log(page);
+
+        const getBooks = await Book.find();
+        res.status(201).json({
+            success: true,
+            data: getBooks
+        })
+    } catch (error) {
+        next(error);
+    }
+})
+
 router.post("/new", verifyUser, async (req, res, next) => {
     try {
         const { id, role, username, email } = req.user;
         if (role !== "admin") return next(ErrorHandler(401, "protected route!!"));
 
-        const { name, description } = req.body;
-        if (!name || !description) return next(ErrorHandler(404, "All fields are required!!"));
+        const { title, description } = req.body;
+        if (!title || !description) return next(ErrorHandler(404, "All fields are required!!"));
 
         const newBook = await Book.create({
-            name,
+            title,
             description,
             author: { id, name: username },
         })
 
         res.status(201).json({
             success: true,
-            message: `create: ${name}`,
+            message: `create: ${newBook.title}`,
             id: newBook._id
         });
 
     } catch (error) {
         next(error);
+
     }
 });
 
@@ -35,13 +53,11 @@ router.post("/issue", verifyUser, async (req, res, next) => {
         const { id, username, email } = req.user;
         const bookId = req.query;
 
-        if (!bookId) return next(ErrorHandler(404, "book not found!!"));
+        if (!bookId) return next(ErrorHandler(404, "invalid credentials!!"));
 
-        const newBook = await Book.findByIdAndUpdate(bookId, {
-            $set: {
-                status: false
-            }
-        })
+        const book = await Book.findById(bookId);
+
+        
 
         res.status(201).json({
             success: true,
@@ -54,14 +70,14 @@ router.post("/issue", verifyUser, async (req, res, next) => {
     }
 });
 
-router.delete("/remove/:id", verifyUser, async (req, res, next)=>{
+router.delete("/remove/:id", verifyUser, async (req, res, next) => {
     try {
-        
+
         const { id, role } = req.user;
         const bookId = req.params.id;
 
-        if(role != "admin") return next(ErrorHandler(401, "unauthorized!!"));
-       
+        if (role != "admin") return next(ErrorHandler(401, "unauthorized!!"));
+
         if (!bookId.match(/^[0-9a-fA-F]{24}$/)) {
             return next(ErrorHandler(400, "Invalid book ID"));
         }
@@ -72,9 +88,9 @@ router.delete("/remove/:id", verifyUser, async (req, res, next)=>{
             return next(ErrorHandler(404, "Book not found"));
         }
 
-        await book.remove();
+        await Book.deleteOne(book);
 
-        res.status(204).json({
+        res.status(200).json({
             success: true,
             message: "resource deleted successfully!"
         })

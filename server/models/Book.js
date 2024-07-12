@@ -1,10 +1,9 @@
 import mongoose from "mongoose";
 
 const BookSchema = new mongoose.Schema({
-    name: {
+    title: {
         type: String,
         required: true,
-        unique: true
     },
     description: {
         type: String,
@@ -24,6 +23,10 @@ const BookSchema = new mongoose.Schema({
     status: {
         type: Boolean,
         default: true
+    },
+    currentConsumer: {
+        type: mongoose.Types.ObjectId,
+        ref: "User",
     }
 }, {
     timestamps: true

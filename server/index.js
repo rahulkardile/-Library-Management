@@ -3,11 +3,11 @@ import mongoose from "mongoose";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import helmet from "helmet";
-import rateLimit from "express-rate-limit"
-import cors from "cors"
+import rateLimit from "express-rate-limit";
+import cors from "cors";
 
 import userRouter from "./routes/User.js";
-import bookRouter from "./routes/Book.js"
+import bookRouter from "./routes/Book.js";
 
 const app = express();
 app.use(express.json());
@@ -15,7 +15,7 @@ app.use(cookieParser());
 app.use(helmet());
 
 app.use(cors({
-    origin: process.env.CORS_ORIGIN || '*',
+    origin: process.env.CORS_ORIGIN || 'http://localhost:3300' || "*",
     optionsSuccessStatus: 200
 }));
 
