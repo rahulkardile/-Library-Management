@@ -2,6 +2,7 @@ import express from "express";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 import ErrorHandler from "./utils/ErrorHandler.js";
+import userRouter from "./routes/User.js";
 
 const app = express();
 app.use(express.json());
@@ -18,14 +19,14 @@ try {
 
 app.get("/", (req, res, next) => {
     try {
-        
-        next(ErrorHandler(403, "error"));
         res.send("server is running fine!");
-
     } catch (error) {
         console.log(error);
     }
 });
+
+// all api routes
+app.use("/api/user", userRouter);
 
 app.get("*", (req, res, next) => {
     try {

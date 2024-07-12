@@ -8,6 +8,7 @@ const UserSchema = new mongoose.Schema({
     username: {
         type: String,
         required: true,
+        unique: true,
         min: 4,
         max: 20
     },
@@ -26,6 +27,11 @@ const UserSchema = new mongoose.Schema({
     contact: {
         type: Number,
         required: true
+    },
+    role: {
+        type: String,
+        enum: ["admin", "user"],
+        default: "user"
     },
 }, {
     timestamps: true
