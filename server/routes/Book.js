@@ -10,8 +10,6 @@ router.get("/all", async (req, res, next) => {
 
         const { page = 1, limit = 10, sortBy = 'title', order = 'asc' } = req.query;
 
-        console.log(page);
-
         const getBooks = await Book.find();
         res.status(201).json({
             success: true,
@@ -48,22 +46,28 @@ router.post("/new", verifyUser, async (req, res, next) => {
     }
 });
 
-router.post("/issue", verifyUser, async (req, res, next) => {
+router.get("/issue", verifyUser, async (req, res, next) => {
     try {
         const { id, username, email } = req.user;
-        const bookId = req.query;
+        const bookId = req.query.id;
 
         if (!bookId) return next(ErrorHandler(404, "invalid credentials!!"));
 
         const book = await Book.findById(bookId);
 
-        
-
-        res.status(201).json({
-            success: true,
-            message: `create: ${name}`,
-            id: newBook._id
-        });
+        if (!book.currentConsumer.includes(id)) {
+            await book.updateOne({ $push: { currentConsumer: id } });
+            res.status(202).json({
+                success: true,
+                message: `book is issued`,
+            });
+        } else {
+            await book.updateOne({ $pull: { currentConsumer: id } });
+            res.status(202).json({
+                success: true,
+                message: `book is droped!`,
+            });
+        }
 
     } catch (error) {
         next(error);

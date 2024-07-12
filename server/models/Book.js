@@ -25,7 +25,7 @@ const BookSchema = new mongoose.Schema({
         default: true
     },
     currentConsumer: {
-        type: mongoose.Types.ObjectId,
+        type: [mongoose.Types.ObjectId],
         ref: "User",
     }
 }, {

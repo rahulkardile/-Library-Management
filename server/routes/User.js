@@ -49,7 +49,6 @@ router.post("/get", async (req, res, next) => {
 
         const library_user = await jwt.sign({ id: getUser._id, role: getUser.role, username: getUser.username }, process.env.JWT_SECRET);
 
-        console.log(pass);
         res.cookie("library_user", library_user, { secure: true, maxAge: oneFifty }).status(200).json({
             success: true,
             user: rest
