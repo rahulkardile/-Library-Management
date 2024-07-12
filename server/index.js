@@ -1,7 +1,6 @@
 import express from "express";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
-import ErrorHandler from "./utils/ErrorHandler.js";
 import userRouter from "./routes/User.js";
 import cookieParser from "cookie-parser";
 
