@@ -1,9 +1,12 @@
 import express from "express"
 import bcrypt from "bcryptjs"
 import ErrorHandler from "../utils/ErrorHandler.js";
+import jwt from "jsonwebtoken"
 import User from "../models/User.js";
+import verifyUser from "../utils/verifyUser.js";
 
 const router = express.Router();
+const oneFifty = 1000 * 60 * 60 * 24 * 150;
 
 router.post("/new", async (req, res, next) => {
     try {
@@ -44,11 +47,25 @@ router.post("/get", async (req, res, next) => {
 
         const { password: pass, ...rest } = await getUser._doc;
 
-        res.status(200).json({
+        const library_user = await jwt.sign({ id: getUser._id, role: getUser.role, username: getUser.username }, process.env.JWT_SECRET);
+
+        console.log(pass);
+        res.cookie("library_user", library_user, { secure: true, maxAge: oneFifty }).status(200).json({
             success: true,
             user: rest
         })
 
+    } catch (error) {
+        next(error);
+    }
+})
+
+router.get("/verify", verifyUser, async (req, res, next) => {
+    try {
+        res.status(200).json({
+            success: true,
+            user: req.user
+        })
     } catch (error) {
         next(error);
     }
