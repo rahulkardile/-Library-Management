@@ -61,8 +61,18 @@ router.delete("/remove/:id", verifyUser, async (req, res, next)=>{
         const bookId = req.params.id;
 
         if(role != "admin") return next(ErrorHandler(401, "unauthorized!!"));
-        
-        const book = await Book.findByIdAndDelete(bookId);
+       
+        if (!bookId.match(/^[0-9a-fA-F]{24}$/)) {
+            return next(ErrorHandler(400, "Invalid book ID"));
+        }
+
+        const book = await Book.findById(bookId);
+
+        if (!book) {
+            return next(ErrorHandler(404, "Book not found"));
+        }
+
+        await book.remove();
 
         res.status(204).json({
             success: true,
